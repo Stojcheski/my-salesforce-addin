@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Salesforce for Outlook</title>
+    
+    <!-- Office.js -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f3f3;
+            font-size: 14px;
+        }
+        
+        .header {
+            background-color: #0176d3;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 16px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            padding: 16px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #080707;
+        }
+        
+        .btn {
+            background-color: #0176d3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .btn:hover {
+            background-color: #014486;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f3f3;
+            color: #080707;
+            border: 1px solid #c9c9c9;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e5e5e5;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #3e3e3c;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #c9c9c9;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #0176d3;
+            box-shadow: 0 0 3px rgba(1, 118, 211, 0.2);
+        }
+        
+        .contact-item {
+            padding: 12px;
+            border-bottom: 1px solid #e5e5e5;
+            cursor: pointer;
+        }
+        
+        .contact-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            color: #0176d3;
+        }
+        
+        .contact-details {
+            font-size: 12px;
+            color: #706e6b;
+            margin-top: 4px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #706e6b;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 16px;
+        }
+        
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #706e6b;
+        }
+        
+        .tab.active {
+            color: #0176d3;
+            border-bottom-color: #0176d3;
+        }
+        
+        .tab:hover {
+            background-color: #f8f9fa;
+        }
+        
+        #authSection {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .auth-message {
+            margin-bottom: 20px;
+            color: #706e6b;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .email-context {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .email-subject {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .email-from {
+            font-size: 12px;
+            color: #706e6b;
+        }
+        
+        .activity-log {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f3f3;
+        }
+        
+        .activity-type {
+            font-weight: 600;
+            font-size: 12px;
+            color: #0176d3;
+        }
+        
+        .activity-date {
+            font-size: 11px;
+            color: #706e6b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Salesforce</h1>
+        <div id="connectionStatus" class="hidden">●</div>
+    </div>
+    
+    <!-- Authentication Section -->
+    <div id="authSection">
+        <div class="auth-message">
+            Connect to your Salesforce org to get started
+        </div>
+        <button class="btn" onclick="authenticateToSalesforce()">Connect to Salesforce</button>
+        <div class="form-group" style="margin-top: 20px;">
+            <label class="form-label">Salesforce Instance URL</label>
+            <input type="text" id="instanceUrl" class="form-control" 
+                   placeholder="https://yourcompany.salesforce.com" 
+                   value="https://login.salesforce.com">
+        </div>
+    </div>
+    
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview')">Overview</div>
+            <div class="tab" onclick="switchTab('contacts')">Contacts</div>
+            <div class="tab" onclick="switchTab('log')">Log Activity</div>
+        </div>
+        
+        <div class="content">
+            <!-- Email Context -->
+            <div id="emailContext" class="card">
+                <div class="email-context">
+                    <div class="email-subject" id="currentSubject">Loading email...</div>
+                    <div class="email-from" id="currentFrom"></div>
+                </div>
+            </div>
+            
+            <!-- Overview Tab -->
+            <div id="overviewTab" class="tab-content">
+                <div class="card">
+                    <div class="section-title">Quick Actions</div>
+                    <button class="btn" onclick="logCurrentEmail()">Log Email to Salesforce</button>
+                    <button class="btn btn-secondary" onclick="createContact()">Create Contact</button>
+                    <button class="btn btn-secondary" onclick="createLead()">Create Lead</button>
+                </div>
+                
+                <div class="card">
+                    <div class="section-title">Related Records</div>
+                    <div id="relatedRecords">
+                        <div class="loading">Searching for related records...</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="section-title">Recent Activity</div>
+                    <div id="recentActivity" class="activity-log">
+                        <div class="loading">Loading activity...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contacts Tab -->
+            <div id="contactsTab" class="tab-content hidden">
+                <div class="card">
+                    <div class="section-title">Search Contacts & Leads</div>
+                    <div class="form-group">
+                        <input type="text" id="searchInput" class="form-control" 
+                               placeholder="Search by name, email, or company..."
+                               onkeyup="searchContacts(event)">
+                    </div>
+                    <button class="btn" onclick="performSearch()">Search</button>
+                </div>
+                
+                <div class="card">
+                    <div class="section-title">Results</div>
+                    <div id="searchResults">
+                        <div class="loading">Enter search terms above</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Log Activity Tab -->
+            <div id="logTab" class="tab-content hidden">
+                <div class="card">
+                    <div class="section-title">Log Email Activity</div>
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" id="logSubject" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Related To</label>
+                        <select id="relatedTo" class="form-control">
+                            <option value="">Select a record...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Comments</label>
+                        <textarea id="logComments" class="form-control" rows="4" 
+                                  placeholder="Add any additional notes..."></textarea>
+                    </div>
+                    <button class="btn" onclick="saveActivity()">Save Activity</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="taskpane.js"></script>
+</body>
+</html>

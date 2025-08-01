@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Salesforce Authentication</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f3f3f3;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0176d3;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .info {
+            color: #0176d3;
+        }
+        h3 {
+            margin: 0 0 15px 0;
+        }
+        p {
+            margin: 10px 0;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <div id="status">Processing authentication...</div>
+    </div>
+
+    <script>
+        // Handle OAuth callback
+        function handleOAuthCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+            
+            const statusDiv = document.getElementById('status');
+            
+            if (error) {
+                // Authentication failed
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h3>Authentication Failed</h3>
+                        <p><strong>${error}</strong></p>
+                        <p>${errorDescription || 'Unknown error occurred'}</p>
+                        <p>This window will close automatically in 5 seconds.</p>
+                    </div>
+                `;
+                
+                // Close popup after showing error
+                setTimeout(() => {
+                    if (window.opener) {
+                        window.opener.postMessage({
+                            type: 'oauth_error',
+                            error: error,
+                            error_description: errorDescription
+                        }, '*');
+                    }
+                    window.close();
+                }, 5000);
+                
+            } else if (code) {
+                // Authentication successful - exchange code for token
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <h3>Authentication Successful!</h3>
+                        <p>Completing setup...</p>
+                    </div>
+                `;
+                
+                // In a real implementation, you would exchange the code for a token
+                // For now, we'll simulate success
+                simulateTokenExchange(code);
+                
+            } else {
+                // No code or error - something went wrong
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h3>Invalid Response</h3>
+                        <p>No authorization code received from Salesforce.</p>
+                        <p>Please try authenticating again.</p>
+                        <p>This window will close automatically in 5 seconds.</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    window.close();
+                }, 5000);
+            }
+        }
+
+        // Simulate token exchange (replace with real implementation)
+        function simulateTokenExchange(code) {
+            // In a real implementation, you would make a server-side call
+            // to exchange the authorization code for an access token
+            
+            setTimeout(() => {
+                // Mock successful token exchange
+                const mockSession = {
+                    access_token: 'mock_access_token_' + Date.now(),
+                    refresh_token: 'mock_refresh_token_' + Date.now(),
+                    instance_url: 'https://yourorg.salesforce.com',
+                    issued_at: Date.now().toString(),
+                    signature: 'mock_signature',
+                    scope: 'full refresh_token',
+                    token_type: 'Bearer',
+                    id: 'https://login.salesforce.com/id/00Dxx0000000000EAA/005xx000000000TAAQ'
+                };
+                
+                // Send success message to parent window
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'oauth_success',
+                        session: mockSession
+                    }, '*');
+                }
+                
+                // Update status
+                document.getElementById('status').innerHTML = `
+                    <div class="success">
+                        <h3>Setup Complete!</h3>
+                        <p>Successfully connected to Salesforce.</p>
+                        <p>You can now close this window.</p>
+                    </div>
+                `;
+                
+                // Close popup after delay
+                setTimeout(() => {
+                    window.close();
+                }, 3000);
+                
+            }, 1500); // Simulate API call delay
+        }
+
+        // Handle messages from parent window
+        window.addEventListener('message', function(event) {
+            console.log('OAuth callback received message:', event.data);
+        });
+
+        // Start OAuth callback handling when page loads
+        document.addEventListener('DOMContentLoaded', handleOAuthCallback);
+
+        // Also try immediate execution in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', handleOAuthCallback);
+        } else {
+            handleOAuthCallback();
+        }
+    </script>
+</body>
+</html>

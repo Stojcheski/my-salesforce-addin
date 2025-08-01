@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+    <script>
+        Office.onReady(() => {
+            console.log('Commands.html loaded');
+        });
+
+        // Function to log email to Salesforce (called from ribbon button)
+        function logEmailToSalesforce(event) {
+            console.log('Log email function called');
+            
+            try {
+                // Get current email item
+                const item = Office.context.mailbox.item;
+                
+                // Check if we have Salesforce session
+                const savedSession = localStorage.getItem('salesforceSession');
+                if (!savedSession) {
+                    // Show notification that user needs to authenticate
+                    if (item.notificationMessages) {
+                        item.notificationMessages.addAsync("authRequired", {
+                            type: "informationalMessage",
+                            message: "Please open the Salesforce pane and authenticate first.",
+                            icon: "icon1",
+                            persistent: false
+                        });
+                    } else {
+                        alert('Please open the Salesforce pane and authenticate first.');
+                    }
+                    event.completed();
+                    return;
+                }
+
+                // Get email details and log to Salesforce
+                if (item.subject) {
+                    item.subject.getAsync((subjectResult) => {
+                        if (subjectResult.status === Office.AsyncResultStatus.Succeeded) {
+                            
+                            const emailData = {
+                                subject: subjectResult.value || 'No Subject',
+                                from: item.from ? item.from.emailAddress : '',
+                                to: item.to ? item.to.map(recipient => recipient.emailAddress).join(';') : '',
+                                date: item.dateTimeCreated || new Date()
+                            };
+
+                            // In a real implementation, make API call to Salesforce
+                            logEmailToSalesforceAPI(emailData)
+                                .then(() => {
+                                    // Show success notification
+                                    if (item.notificationMessages) {
+                                        item.notificationMessages.addAsync("logSuccess", {
+                                            type: "informationalMessage",
+                                            message: "Email logged to Salesforce successfully! (Demo mode)",
+                                            icon: "icon1",
+                                            persistent: false
+                                        });
+                                    } else {
+                                        alert('Email logged to Salesforce successfully! (Demo mode)');
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error logging email:', error);
+                                    // Show error notification
+                                    if (item.notificationMessages) {
+                                        item.notificationMessages.addAsync("logError", {
+                                            type: "errorMessage",
+                                            message: "Failed to log email to Salesforce. Please try again.",
+                                            icon: "icon1",
+                                            persistent: false
+                                        });
+                                    } else {
+                                        alert('Failed to log email to Salesforce. Please try again.');
+                                    }
+                                });
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error in logEmailToSalesforce:', error);
+                alert('Error accessing email data');
+            }
+
+            event.completed();
+        }
+
+        // Mock function to log email to Salesforce API
+        async function logEmailToSalesforceAPI(emailData) {
+            const session = JSON.parse(localStorage.getItem('salesforceSession'));
+            
+            // This would be a real API call in production
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    // Simulate success/failure
+                    if (session && session.access_token) {
+                        console.log('Mock: Email logged to Salesforce', emailData);
+                        resolve({ success: true, id: 'activity_' + Date.now() });
+                    } else {
+                        reject(new Error('Authentication required'));
+                    }
+                }, 1000);
+            });
+        }
+
+        // Function to create contact from current email sender
+        function createContactFromSender(event) {
+            console.log('Create contact function called');
+            
+            try {
+                const item = Office.context.mailbox.item;
+                const savedSession = localStorage.getItem('salesforceSession');
+                
+                if (!savedSession) {
+                    if (item.notificationMessages) {
+                        item.notificationMessages.addAsync("authRequired", {
+                            type: "informationalMessage",
+                            message: "Please open the Salesforce pane and authenticate first.",
+                            icon: "icon1",
+                            persistent: false
+                        });
+                    } else {
+                        alert('Please open the Salesforce pane and authenticate first.');
+                    }
+                    event.completed();
+                    return;
+                }
+
+                if (item.from) {
+                    const fromAddress = item.from;
+                    const nameParts = (fromAddress.displayName || '').split(' ');
+                    const firstName = nameParts[0] || '';
+                    const lastName = nameParts.slice(1).join(' ') || fromAddress.displayName || '';
+
+                    // In demo mode, just show what would happen
+                    const message = `Would create Salesforce Contact for: ${fromAddress.displayName} (${fromAddress.emailAddress})`;
+                    
+                    if (item.notificationMessages) {
+                        item.notificationMessages.addAsync("contactCreated", {
+                            type: "informationalMessage",
+                            message: message + " (Demo mode)",
+                            icon: "icon1",
+                            persistent: false
+                        });
+                    } else {
+                        alert(message + " (Demo mode)");
+                    }
+                } else {
+                    if (item.notificationMessages) {
+                        item.notificationMessages.addAsync("noSender", {
+                            type: "errorMessage",
+                            message: "No sender information available for this email.",
+                            icon: "icon1",
+                            persistent: false
+                        });
+                    } else {
+                        alert('No sender information available for this email.');
+                    }
+                }
+            } catch (error) {
+                console.error('Error in createContactFromSender:', error);
+                alert('Error accessing email data');
+            }
+
+            event.completed();
+        }
+
+        // Function to search for related records
+        function searchRelatedRecords(event) {
+            console.log('Search related records function called');
+            
+            try {
+                const item = Office.context.mailbox.item;
+                const savedSession = localStorage.getItem('salesforceSession');
+                
+                if (!savedSession) {
+                    if (item.notificationMessages) {
+                        item.notificationMessages.addAsync("authRequired", {
+                            type: "informationalMessage",
+                            message: "Please open the Salesforce pane and authenticate first.",
+                            icon: "icon1",
+                            persistent: false
+                        });
+                    } else {
+                        alert('Please open the Salesforce pane and authenticate first.');
+                    }
+                    event.completed();
+                    return;
+                }
+
+                // Extract email addresses for search
+                const emailAddresses = [];
+                if (item.from) {
+                    emailAddresses.push(item.from.emailAddress);
+                }
+                if (item.to) {
+                    item.to.forEach(recipient => {
+                        emailAddresses.push(recipient.emailAddress);
+                    });
+                }
+
+                if (emailAddresses.length > 0) {
+                    // In a real implementation, search Salesforce for records with these email addresses
+                    searchSalesforceByEmail(emailAddresses)
+                        .then((results) => {
+                            const message = results.length > 0 
+                                ? `Found ${results.length} related record(s) in Salesforce. Check the task pane for details. (Demo mode)`
+                                : 'No related records found in Salesforce. (Demo mode)';
+                            
+                            if (item.notificationMessages) {
+                                item.notificationMessages.addAsync("searchResults", {
+                                    type: "informationalMessage",
+                                    message: message,
+                                    icon: "icon1",
+                                    persistent: false
+                                });
+                            } else {
+                                alert(message);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Search error:', error);
+                            if (item.notificationMessages) {
+                                item.notificationMessages.addAsync("searchError", {
+                                    type: "errorMessage",
+                                    message: "Error searching Salesforce records.",
+                                    icon: "icon1",
+                                    persistent: false
+                                });
+                            } else {
+                                alert('Error searching Salesforce records.');
+                            }
+                        });
+                }
+            } catch (error) {
+                console.error('Error in searchRelatedRecords:', error);
+                alert('Error accessing email data');
+            }
+
+            event.completed();
+        }
+
+        // Mock function to search Salesforce by email
+        async function searchSalesforceByEmail(emailAddresses) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Mock results
+                    const mockResults = emailAddresses.map((email, index) => ({
+                        id: `record_${index}`,
+                        type: index % 2 === 0 ? 'Contact' : 'Lead',
+                        email: email,
+                        name: `Contact ${index + 1}`
+                    }));
+                    console.log('Mock search results:', mockResults);
+                    resolve(mockResults);
+                }, 1000);
+            });
+        }
+
+        // Register functions for command execution
+        if (Office.actions) {
+            Office.actions.associate("logEmailToSalesforce", logEmailToSalesforce);
+            Office.actions.associate("createContactFromSender", createContactFromSender);
+            Office.actions.associate("searchRelatedRecords", searchRelatedRecords);
+        }
+    </script>
+</body>
+</html>
