@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesforce Outlook Add-in</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            color: #0176d3;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 18px;
+        }
+        .status {
+            background: #e8f4f8;
+            border-left: 4px solid #0176d3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .files {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .files h3 {
+            margin-top: 0;
+            color: #0176d3;
+        }
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .file-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .step {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        .step strong {
+            color: #0176d3;
+        }
+        .links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        .link {
+            background: #0176d3;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .link:hover {
+            background: #014486;
+        }
+        .link.secondary {
+            background: #6c757d;
+        }
+        .link.secondary:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Salesforce Outlook Add-in</h1>
+            <p>Integrate your Outlook with Salesforce CRM</p>
+        </div>
+
+        <div class="status success">
+            <strong>✅ GitHub Pages is Working!</strong><br>
+            Your add-in files are successfully deployed and accessible.
+        </div>
+
+        <div class="files">
+            <h3>📁 Add-in Files</h3>
+            <p>The following files are available for your Outlook add-in:</p>
+            <div class="file-list">
+                <div class="file-item">manifest.xml</div>
+                <div class="file-item">taskpane.html</div>
+                <div class="file-item">taskpane.js</div>
+                <div class="file-item">commands.html</div>
+                <div class="file-item">config.js</div>
+                <div class="file-item">salesforce-service.js</div>
+                <div class="file-item">oauth-callback.html</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Installation Instructions</h3>
+            <div class="step">
+                <strong>1.</strong> Go to <a href="https://outlook.office.com" target="_blank">Outlook on the web</a>
+            </div>
+            <div class="step">
+                <strong>2.</strong> Click Settings (gear icon) → View all Outlook settings
+            </div>
+            <div class="step">
+                <strong>3.</strong> Go to Mail → Manage add-ins
+            </div>
+            <div class="step">
+                <strong>4.</strong> Click "Add a custom add-in" → "Add from file"
+            </div>
+            <div class="step">
+                <strong>5.</strong> Upload your <code>manifest.xml</code> file
+            </div>
+            <div class="step">
+                <strong>6.</strong> Open any email and look for the Salesforce button!
+            </div>
+        </div>
+
+        <div class="status">
+            <strong>🔗 Add-in URLs:</strong><br>
+            <strong>Task Pane:</strong> <a href="./taskpane.html" target="_blank">taskpane.html</a><br>
+            <strong>Commands:</strong> <a href="./commands.html" target="_blank">commands.html</a><br>
+            <strong>OAuth Callback:</strong> <a href="./oauth-callback.html" target="_blank">oauth-callback.html</a>
+        </div>
+
+        <div class="links">
+            <a href="./taskpane.html" class="link">View Task Pane</a>
+            <a href="./manifest.xml" class="link secondary">Download Manifest</a>
+            <a href="https://github.com/Stojcheski/my-salesforce-addin" class="link secondary">View Source</a>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e9ecef; text-align: center; color: #666; font-size: 14px;">
+            <p>This is a development version of the Salesforce Outlook Add-in.<br>
+            All functionality is currently in demo mode with mock data.</p>
+        </div>
+    </div>
+</body>
+</html>
