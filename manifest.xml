@@ -13,7 +13,7 @@
   <Description DefaultValue="Integrate Outlook with Salesforce CRM - log emails, track contacts, and manage opportunities"/>
   <IconUrl DefaultValue="https://img.icons8.com/fluency/32/salesforce.png"/>
   <HighResolutionIconUrl DefaultValue="https://img.icons8.com/fluency/80/salesforce.png"/>
-  <SupportUrl DefaultValue="https://YOUR_USERNAME.github.io/salesforce-outlook-addin"/>
+  <SupportUrl DefaultValue="https://Stojcheski.github.io/my-salesforce-addin"/>
   
   <Hosts>
     <Host Name="Mailbox"/>
@@ -28,7 +28,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://YOUR_USERNAME.github.io/salesforce-outlook-addin/taskpane.html"/>
+        <SourceLocation DefaultValue="https://Stojcheski.github.io/my-salesforce-addin/taskpane.html"/>
         <RequestedHeight>450</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -136,8 +136,8 @@
         <bt:Image id="Icon.80x80" DefaultValue="https://img.icons8.com/fluency/80/salesforce.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://YOUR_USERNAME.github.io/salesforce-outlook-addin/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://YOUR_USERNAME.github.io/salesforce-outlook-addin/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://Stojcheski.github.io/my-salesforce-addin/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://Stojcheski.github.io/my-salesforce-addin/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="Salesforce"/>
